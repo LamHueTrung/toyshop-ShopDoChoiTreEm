@@ -1,0 +1,13 @@
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  # Nếu yêu cầu không phải là một tệp hoặc thư mục
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_FILENAME} !-d
+  # Chuyển hướng tất cả về index.php
+  RewriteRule ^(.*)$ index.php?page=$1 [L,QSA]
+</IfModule>
+
+Alias /uploads /path/to/uploads
+<Directory "/path/to/uploads">
+    Require all granted
+</Directory>
