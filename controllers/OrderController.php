@@ -40,7 +40,7 @@ class OrderController
             // Add order details
             foreach ($cartItems as $item) {
                 $this->orderDetailModel->addDetail($orderId, $item['product_id'], $item['quantity'], $item['product_price']);
-
+                $this->cartModel->removeItem($item['cart_id']);
                 // Update product stock
                 $this->productModel->updateStock($item['product_id'], $item['quantity']);
             }
@@ -48,6 +48,7 @@ class OrderController
             return [
                 'success' => true,
                 'message' => 'Order created successfully.',
+                'id_cart' => $cartItems,
                 'order_id' => $orderId,
             ];
         } catch (Exception $e) {
@@ -98,7 +99,7 @@ class OrderController
                 throw new Exception('Order not found.');
             }
 
-            $order['details'] = $this->orderDetailModel->getByOrderId($id);
+            // $order['details'] = $this->orderDetailModel->getByOrderId($id);
 
             return [
                 'success' => true,

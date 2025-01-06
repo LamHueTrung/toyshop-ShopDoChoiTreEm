@@ -6,7 +6,7 @@ $pdo = require __DIR__ . '/../../config/database.php';
 $categoryController = new CategoryController($pdo);
 
 $categoryId = $_GET['id'] ?? null;
-$response = $categoryController->getCategoryById($categoryId);
+$response = $categoryController->getProductsById($categoryId);
 
 header('Content-Type: application/json');
 echo json_encode($response);

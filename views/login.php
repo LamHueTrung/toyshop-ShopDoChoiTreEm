@@ -102,10 +102,14 @@
 <?php
 session_start();
 
-// Kiểm tra nếu session 'user' không tồn tại hoặc role không phải là 'admin'
 if (isset($_SESSION['user']) && $_SESSION['user']['role'] === 'admin') {
     // Chuyển hướng về trang đăng nhập
     header('Location: /?page=admin-dashboard');
+    exit(); // Ngừng thực thi mã sau khi chuyển hướng
+}
+if (isset($_SESSION['user']) && $_SESSION['user']['role'] === 'user') {
+    // Chuyển hướng về trang đăng nhập
+    header('Location: /?page=home');
     exit(); // Ngừng thực thi mã sau khi chuyển hướng
 }
 ?>

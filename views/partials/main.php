@@ -6,7 +6,7 @@
     document.addEventListener('DOMContentLoaded', function () {
         const productList = document.getElementById('product-list');
         const apiUrl = '/api/products/get_all_products';
-
+        const UseId = <?php echo isset($_SESSION['user']['id']) ? json_encode($_SESSION['user']['id']) : 'null'; ?>;
         // Gọi API để lấy danh sách sản phẩm
         fetch(apiUrl)
             .then(response => response.json())
@@ -16,6 +16,7 @@
                     data.products.forEach((product, index) => {
                         const imageUrl = product.images.length > 0 ? product.images[0].image_url : '/uploads/baby-toy.png';
                         const animationDelay = 0.3 + (index * 0.2); // Tính thời gian trễ
+                        console.log(product);
                         const productCard = `
                             <div class="col-md-6 col-lg-3">
                                 <div class="card h-100 animate__animated animate__zoomIn" style="animation-delay: ${animationDelay}s;">
@@ -39,8 +40,24 @@
                     // Thêm sự kiện cho nút "Thêm vào giỏ hàng"
                     document.querySelectorAll('.add-to-cart-btn').forEach(button => {
                         button.addEventListener('click', function () {
-                            const productId = this.getAttribute('data-id');
-                            addToCart(productId);
+                            if(UseId == null){
+                                Swal.fire({
+                                text: 'Vui lòng đăng nhập để thêm sản phẩm vào giỏ hàng!',
+                                icon: 'error',
+                                showCancelButton: true,
+                                confirmButtonColor: '#3085d6',
+                                cancelButtonColor: '#d33',
+                                confirmButtonText: 'Đăng nhập',
+                                cancelButtonText: 'Quay lại sau'
+                            }).then((result) => {
+                                if (result.isConfirmed) {
+                                    window.location.href = '/?page=login';
+                                }
+                            });
+                            } else {
+                                const productId = this.getAttribute('data-id');
+                                addToCart(productId);
+                            }
                         });
                     });
                     document.querySelectorAll('.add-to-view-btn').forEach(button => {

@@ -11,7 +11,6 @@
 
     <title>SB Admin 2 - Dashboard</title>
 
-    <!-- Custom fonts for this template-->
     <link href="vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
     <link
         href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i"
@@ -57,15 +56,15 @@ if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'admin') {
 
                 <!-- Begin Page Content -->
                 <div class="container-fluid">
-
+                    
                     <!-- Page Heading -->
                     <div class="card shadow mb-4">
                         <div class="card-header py-3">
-                            <h6 class="m-0 font-weight-bold text-primary">Danh sách danh mục sản phẩm</h6>
+                            <h6 class="m-0 font-weight-bold text-primary"></h6>
                         </div>
                         <div class="card-body">
                             <div class="table-responsive">
-                                <table class="table table-bordered" id="categoryTable" width="100%" cellspacing="0">
+                                <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
                                     <thead>
                                         <tr>
                                             <th>ID</th>
@@ -108,6 +107,9 @@ if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'admin') {
     <?php include(__DIR__ . '\..\partials\modal.php'); ?>
 
 
+    <!-- Logout Modal-->
+    <?php include(__DIR__ . '\..\partials\modal.php'); ?>
+
     <!-- Bootstrap core JavaScript-->
     <script src="vendor/jquery/jquery.min.js"></script>
     <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
@@ -128,7 +130,7 @@ if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'admin') {
     <script src="vendor/datatables/dataTables.bootstrap4.min.js"></script>
 
     <!-- Page level custom scripts -->
-    <script src="js/demo/datatables-demo.js"></script>
+    <!-- <script src="js/demo/datatables-demo.js"></script> -->
     <script>
         $(document).ready(function () {
             // Gọi API để lấy danh sách danh mục
@@ -148,6 +150,7 @@ if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'admin') {
                         <td>${category.name}</td>
                         <td>${category.description || 'Không có mô tả'}</td>
                         <td>
+                            <button class="btn btn-success btn-sm btn-detail" data-id="${category.id}">Xem</button>
                             <button class="btn btn-info btn-sm btn-edit" data-id="${category.id}">Sửa</button>
                             <button class="btn btn-danger btn-sm btn-delete" data-id="${category.id}">Xoá</button>
                         </td>
@@ -168,6 +171,12 @@ if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'admin') {
                         $('.btn-edit').on('click', function () {
                             const categoryId = $(this).data('id');
                             editCategory(categoryId);
+                        });
+
+                        // Thêm sự kiện Sửa
+                        $('.btn-detail').on('click', function () {
+                            const categoryId = $(this).data('id');
+                            detailCategory(categoryId);
                         });
                     } else {
                         Swal.fire({
@@ -218,12 +227,15 @@ if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'admin') {
                     });
             }
 
-            // Hàm sửa danh mục (giả sử có giao diện sửa)
             function editCategory(categoryId) {
                 // Chuyển hướng tới giao diện chỉnh sửa danh mục
                 window.location.href = `/?page=admin-category-edit&id=${categoryId}`;
             }
 
+            function detailCategory(categoryId) {
+                // Chuyển hướng tới giao diện chỉnh sửa danh mục
+                window.location.href = `/?page=admin-category-detail&id=${categoryId}`;
+            }
         });
 
     </script>

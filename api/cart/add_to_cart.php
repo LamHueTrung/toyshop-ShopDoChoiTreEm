@@ -7,7 +7,6 @@ $pdo = require __DIR__ . '/../../config/database.php';
 $cartController = new CartController($pdo);
 
 session_start();
-// Lấy dữ liệu từ body của yêu cầu
 $data = json_decode(file_get_contents('php://input'), true);
 $userId = $_SESSION['user']['id'] ?? null;
 

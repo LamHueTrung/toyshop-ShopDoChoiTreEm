@@ -19,6 +19,12 @@ class Cart
     ");
         return $stmt->execute([$user_id, $product_id, $quantity, $quantity]);
     }
+    public function create($user_id, $total_price, $status = 'pending')
+    {
+        $stmt = $this->pdo->prepare("INSERT INTO orders (user_id, total_price, status) VALUES (?, ?, ?)");
+        $stmt->execute([$user_id, $total_price, $status]);
+        return $this->pdo->lastInsertId();
+    }
 
 
     // Lấy thông tin giỏ hàng theo ID
@@ -50,9 +56,8 @@ class Cart
             // Log lỗi cơ sở dữ liệu
             error_log('Database Error: ' . $e->getMessage());
             return false;
-        } 
+        }
     }
-
 
     public function getCartItem($user_id, $product_id)
     {
@@ -63,7 +68,6 @@ class Cart
         $stmt->execute([$user_id, $product_id]);
         return $stmt->fetch();
     }
-
 
     // Lấy danh sách giỏ hàng theo user_id
     public function getByUserId($user_id)
@@ -78,7 +82,6 @@ class Cart
         return $stmt->fetchAll();
     }
 
-    // Lấy giỏ hàng với thông tin chi tiết sản phẩm
     public function getCartWithProductDetails($userId)
     {
         $stmt = $this->pdo->prepare("
@@ -98,7 +101,6 @@ class Cart
         $stmt->execute([$userId]);
         return $stmt->fetchAll();
     }
-
 
     // Cập nhật số lượng sản phẩm trong giỏ hàng
     public function updateItem($cart_id, $quantity)

@@ -1,14 +1,17 @@
 <?php
 
 require_once __DIR__ . '/../models/Category.php';
+require_once __DIR__ . '/../models/Product.php';
 
 class CategoryController
 {
     private $categoryModel;
+    private $productModel;
 
     public function __construct($pdo)
     {
         $this->categoryModel = new Category($pdo);
+        $this->productModel = new Product($pdo);
     }
 
     public function createCategory($data)
@@ -62,6 +65,40 @@ class CategoryController
             ];
         } catch (Exception $e) {
             return ['error' => $e->getMessage()];
+        }
+    }
+
+    public function getProductsById($id)
+    {
+        try {
+            // Kiểm tra nếu ID danh mục không được cung cấp
+            if (empty($id)) {
+                throw new Exception('Category ID is required.');
+            }
+
+            // Kiểm tra danh mục tồn tại
+            $category = $this->categoryModel->getById($id);
+            if (!$category) {
+                throw new Exception('Category not found.');
+            }
+
+            // Lấy danh sách sản phẩm theo ID danh mục
+            $products = $this->productModel->getByCategoryId($id);
+
+            if (!$products || count($products) === 0) {
+                throw new Exception('No products found for this category.');
+            }
+
+            return [
+                'success' => true,
+                'category' => $category,
+                'products' => $products
+            ];
+        } catch (Exception $e) {
+            return [
+                'success' => false,
+                'error' => $e->getMessage()
+            ];
         }
     }
 

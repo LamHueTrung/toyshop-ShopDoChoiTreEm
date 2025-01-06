@@ -11,10 +11,25 @@ class Product
 
     public function create($name, $description, $price, $stock, $category_id)
     {
-        $stmt = $this->pdo->prepare("CALL AddProduct(?, ?, ?, ?, ?)");
-        $stmt->execute([$name, $description, $price, $stock, $category_id]);
+        // Câu lệnh SQL INSERT trực tiếp
+        $stmt = $this->pdo->prepare(
+            "INSERT INTO products (name, description, price, stock, category_id) 
+         VALUES (:name, :description, :price, :stock, :category_id)"
+        );
+
+        // Thực hiện chèn dữ liệu
+        $stmt->execute([
+            ':name' => $name,
+            ':description' => $description,
+            ':price' => $price,
+            ':stock' => $stock,
+            ':category_id' => $category_id
+        ]);
+
+        // Trả về ID sản phẩm vừa được tạo
         return $this->pdo->lastInsertId();
     }
+
 
     public function getById($id)
     {
@@ -58,5 +73,53 @@ class Product
     {
         $stmt = $this->pdo->prepare("UPDATE products SET stock = stock - ? WHERE id = ? AND stock >= ?");
         return $stmt->execute([$quantity, $productId, $quantity]);
+    }
+
+    public function getByCategoryId($categoryId)
+    {
+        try {
+            if (empty($categoryId)) {
+                throw new Exception('Category ID is required.');
+            }
+
+            // Truy vấn lấy sản phẩm và hình ảnh liên quan
+            $stmt = $this->pdo->prepare("
+            SELECT 
+                p.id,
+                p.name,
+                p.price,
+                p.stock,
+                p.category_id,
+                pi.image_url
+            FROM products p
+            LEFT JOIN product_images pi ON p.id = pi.product_id
+            WHERE p.category_id = :category_id
+        ");
+            $stmt->execute(['category_id' => $categoryId]);
+
+            // Nhóm các sản phẩm và hình ảnh
+            $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            $products = [];
+            foreach ($rows as $row) {
+                $productId = $row['id'];
+                if (!isset($products[$productId])) {
+                    $products[$productId] = [
+                        'id' => $row['id'],
+                        'name' => $row['name'],
+                        'price' => $row['price'],
+                        'stock' => $row['stock'],
+                        'category_id' => $row['category_id'],
+                        'images' => []
+                    ];
+                }
+                if ($row['image_url']) {
+                    $products[$productId]['images'][] = $row['image_url'];
+                }
+            }
+
+            return array_values($products); // Trả về danh sách sản phẩm
+        } catch (Exception $e) {
+            return ['error' => $e->getMessage()];
+        }
     }
 }

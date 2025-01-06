@@ -71,7 +71,11 @@ switch ($page) {
     case 'admin-product-edit':
         require_once __DIR__ . '/../views/admin/products/edit.php';
         break;
-
+        
+    case 'admin-product-detail':
+        require_once __DIR__ . '/../views/admin/products/detail.php';
+        break;
+        
     case 'admin-categories':
         require_once __DIR__ . '/../views/admin/categories/list.php';
         break;
@@ -84,6 +88,9 @@ switch ($page) {
         require_once __DIR__ . '/../views/admin/categories/edit.php';
         break;
 
+    case 'admin-category-detail':
+        require_once __DIR__ . '/../views/admin/categories/detail.php';
+        break;
     case 'admin-orders':
         require_once __DIR__ . '/../views/admin/orders/list.php';
         break;

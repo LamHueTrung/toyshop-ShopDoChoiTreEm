@@ -167,7 +167,6 @@ class CartController
             }
 
             $cartItems = $this->cartModel->getCartWithProductDetails($userId);
-
             return [
                 'success' => true,
                 'cart_items' => $cartItems

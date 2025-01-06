@@ -71,8 +71,7 @@
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
-                        console.log(data.order[0].order_id)
-                        renderOrderDetails(data.order[0]);
+                        renderOrderDetails(data.order);
                     } else {
                         orderDetails.html(`<div class="card-body"><p class="text-danger">${data.error || 'Không thể tải chi tiết đơn hàng.'}</p></div>`);
                     }
@@ -85,29 +84,33 @@
             // Render order details
             // Render order details
             function renderOrderDetails(order) {
-                let itemsHTML = `
-        <tr>
-            <td>${order.product_name}</td>
-            <td>${order.quantity}</td>
-            <td>${Number(order.product_price).toLocaleString()} VND</td>
-            <td>${(order.quantity * order.product_price).toLocaleString()} VND</td>
-        </tr>
-    `;
+                let itemsHTML = "";
+                // Lặp qua tất cả các bản ghi trong order
+                order.forEach(item => {
+                    itemsHTML += `
+                    <tr>
+                        <td>${item.product_name}</td>
+                        <td>${item.quantity}</td>
+                        <td>${Number(item.product_price).toLocaleString()} VND</td>
+                        <td>${(item.quantity * item.product_price).toLocaleString()} VND</td>
+                    </tr>
+                `;
+                });
 
-                const orderStatusClass = getOrderStatusClass(order.status);
+                const orderStatusClass = getOrderStatusClass(order[0].status);
 
                 orderDetails.html(`
         <div class="card-header">
-            Đơn hàng #${order.order_id}
+            Đơn hàng #${order[0].order_id}
         </div>
         <div class="card-body">
             <h5 class="card-title">Thông tin khách hàng</h5>
-            <p class="card-text">Họ và tên: ${order.user_name}</p>
-            <p class="card-text">Email: ${order.user_email}</p>
-            <p class="card-text">Số điện thoại: ${order.user_phone}</p>
+            <p class="card-text">Họ và tên: ${order[0].user_name}</p>
+            <p class="card-text">Email: ${order[0].user_email}</p>
+            <p class="card-text">Số điện thoại: ${order[0].user_phone}</p>
             <hr>
             <h5 class="card-title">Địa chỉ giao hàng</h5>
-            <p class="card-text">${order.user_address}</p>
+            <p class="card-text">${order[0].user_address}</p>
             <hr>
             <h5 class="card-title">Sản phẩm</h5>
             <table class="table table-bordered">
@@ -125,10 +128,10 @@
             </table>
             <hr>
             <h5 class="card-title">Trạng thái</h5>
-            <p class="card-text order-status-label ${orderStatusClass}">${mapOrderStatus(order.status)}</p>
+            <p class="card-text order-status-label ${orderStatusClass}">${mapOrderStatus(order[0].status)}</p>
             <hr>
             <h5 class="card-title">Tổng tiền</h5>
-            <p class="text-success font-weight-bold">${Number(order.total_price).toLocaleString()} VND</p>
+            <p class="text-success font-weight-bold">${Number(order[0].total_price).toLocaleString()} VND</p>
             <hr>
             <div class="d-flex justify-content-between">
                 <button class="btn btn-success btn-update-status" data-status="completed">Đánh dấu hoàn thành</button>
@@ -140,7 +143,7 @@
                 // Add event listeners for buttons
                 $('.btn-update-status').on('click', function () {
                     const newStatus = $(this).data('status');
-                    updateOrderStatus(order.order_id, newStatus);
+                    updateOrderStatus(order[0].order_id, newStatus);
                 });
             }
 

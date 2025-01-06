@@ -136,8 +136,6 @@ class ProductController
         }
     }
 
-
-
     public function deleteProduct($id)
     {
         try {
@@ -153,18 +151,25 @@ class ProductController
 
             // Xóa hình ảnh liên quan
             $images = $this->productImageModel->getByProductId($id);
-            foreach ($images as $image) {
-                if (file_exists($image['image_url'])) {
-                    unlink($image['image_url']);
-                }
-                $this->productImageModel->delete($image['id']);
-            }
 
+            foreach ($images as $image) {
+                // Lấy đường dẫn đầy đủ của tệp
+                $filePath = __DIR__ . '/../public' . $image['image_url'];
+            
+                // Kiểm tra và xóa tệp nếu tồn tại
+                if (!empty($image['image_url']) && file_exists($filePath)) {
+                    unlink($filePath);
+                } else {
+                    echo "Tệp không tồn tại hoặc không thể xóa: {$filePath}\n";
+                }
+            }
+            
             // Xóa sản phẩm
             $result = $this->productModel->delete($id);
 
             return [
                 'success' => $result,
+                'images' => $images,
                 'message' => $result ? 'Sản phẩm đã được xóa thành công.' : 'Xóa sản phẩm thất bại.',
             ];
         } catch (Exception $e) {

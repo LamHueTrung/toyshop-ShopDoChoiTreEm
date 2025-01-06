@@ -78,6 +78,106 @@ if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'admin') {
                                     <tbody id="user-table-body">
                                         <!-- Dữ liệu từ API sẽ được đổ vào đây -->
                                     </tbody>
+                                    <script>
+                                        document.addEventListener("DOMContentLoaded", function () {
+                                            // Gọi API để lấy danh sách người dùng
+                                            fetch('/api/users/get_all_users')
+                                                .then(response => response.json())
+                                                .then(data => {
+                                                    if (data) {
+                                                        const users = data.users; // Lấy danh sách user từ API
+                                                        const tableBody = $('#user-table-body');
+                                                        tableBody.empty(); // Xóa dữ liệu cũ (nếu có)
+
+                                                        // Lặp qua danh sách user và thêm vào bảng
+                                                        users.forEach(user => {
+                                                            const row = `
+                        <tr>
+                            <td>${user.id}</td>
+                            <td>${user.username}</td>
+                            <td>${user.password}</td>
+                            <td>${user.fullname || 'N/A'}</td>
+                            <td>
+                            <button class="btn btn-info btn-sm btn-view-detail" data-id="${user.id}">Xem chi tiết</button>
+                                <button class="btn btn-danger btn-sm btn-delete" data-id="${user.id}">Xoá</button>
+                            </td>
+                        </tr>
+                    `;
+                                                            tableBody.append(row);
+                                                        });
+
+                                                        // Thêm sự kiện Xóa
+                                                        $('.btn-delete').on('click', function () {
+                                                            const userId = $(this).data('id');
+                                                            if (confirm('Bạn có chắc muốn xoá người dùng này?')) {
+                                                                deleteUser(userId);
+                                                            }
+                                                        });
+                                                    } else {
+                                                        alert('Không thể tải danh sách người dùng');
+                                                    }
+                                                })
+                                                .catch(error => {
+                                                    console.error('Error fetching user data:', error);
+                                                    alert('Đã xảy ra lỗi khi tải danh sách người dùng');
+                                                });
+
+                                            // Hàm xóa user
+                                            function deleteUser(userId) {
+                                                fetch(`/api/users/delete_user?id=${userId}`, {
+                                                    method: 'DELETE',
+                                                })
+                                                    .then(response => response.json())
+                                                    .then(data => {
+                                                        if (data.success) {
+                                                            alert('Xoá người dùng thành công');
+                                                            location.reload(); // Tải lại trang sau khi xoá thành công
+                                                        } else {
+                                                            alert('Không thể xoá người dùng');
+                                                        }
+                                                    })
+                                                    .catch(error => {
+                                                        console.error('Error deleting user:', error);
+                                                        alert('Đã xảy ra lỗi khi xoá người dùng');
+                                                    });
+                                            }
+
+                                            // Sự kiện khi nhấn vào nút "Xem Chi Tiết"
+                                            $(document).on('click', '.btn-view-detail', function () {
+                                                const userId = $(this).data('id');
+
+                                                // Gọi API để lấy thông tin chi tiết của người dùng
+                                                fetch(`/api/users/get_user_by_id?id=${userId}`)
+                                                    .then(response => response.json())
+                                                    .then(data => {
+                                                        if (data.success) {
+                                                            const user = data.user;
+
+                                                            // Điền thông tin người dùng vào modal
+                                                            $('#detail-id').text(user.id);
+                                                            $('#detail-username').text(user.username);
+                                                            $('#detail-password').text(user.password);
+                                                            $('#detail-email').text(user.email);
+                                                            $('#detail-fullname').text(user.fullname || 'N/A');
+                                                            $('#detail-phone').text(user.phone || 'N/A');
+                                                            $('#detail-address').text(user.address || 'N/A');
+                                                            $('#detail-role').text(user.role);
+                                                            $('#detail-created-at').text(user.created_at);
+
+                                                            // Hiển thị modal
+                                                            $('#userDetailModal').modal('show');
+                                                        } else {
+                                                            alert('Không thể lấy thông tin người dùng');
+                                                        }
+                                                    })
+                                                    .catch(error => {
+                                                        console.error('Error fetching user details:', error);
+                                                        alert('Đã xảy ra lỗi khi lấy thông tin người dùng');
+                                                    });
+                                            });
+                                        });
+
+                                    </script>
                                 </table>
                             </div>
                         </div>
@@ -128,107 +228,8 @@ if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'admin') {
     <script src="vendor/datatables/dataTables.bootstrap4.min.js"></script>
 
     <!-- Page level custom scripts -->
-    <script src="js/demo/datatables-demo.js"></script>
-    <script>
-        $(document).ready(function () {
-            // Gọi API để lấy danh sách người dùng
-            fetch('/api/users/get_all_users')
-                .then(response => response.json())
-                .then(data => {
-                    if (data) {
-                        const users = data.users; // Lấy danh sách user từ API
-                        const tableBody = $('#user-table-body');
-                        tableBody.empty(); // Xóa dữ liệu cũ (nếu có)
+    <!-- <script src="js/demo/datatables-demo.js"></script> -->
 
-                        // Lặp qua danh sách user và thêm vào bảng
-                        users.forEach(user => {
-                            const row = `
-                        <tr>
-                            <td>${user.id}</td>
-                            <td>${user.username}</td>
-                            <td>${user.password}</td>
-                            <td>${user.fullname || 'N/A'}</td>
-                            <td>
-                            <button class="btn btn-info btn-sm btn-view-detail" data-id="${user.id}">Xem chi tiết</button>
-                                <button class="btn btn-danger btn-sm btn-delete" data-id="${user.id}">Xoá</button>
-                            </td>
-                        </tr>
-                    `;
-                            tableBody.append(row);
-                        });
-
-                        // Thêm sự kiện Xóa
-                        $('.btn-delete').on('click', function () {
-                            const userId = $(this).data('id');
-                            if (confirm('Bạn có chắc muốn xoá người dùng này?')) {
-                                deleteUser(userId);
-                            }
-                        });
-                    } else {
-                        alert('Không thể tải danh sách người dùng');
-                    }
-                })
-                .catch(error => {
-                    console.error('Error fetching user data:', error);
-                    alert('Đã xảy ra lỗi khi tải danh sách người dùng');
-                });
-
-            // Hàm xóa user
-            function deleteUser(userId) {
-                fetch(`/api/users/delete_user?id=${userId}`, {
-                    method: 'DELETE',
-                })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-                            alert('Xoá người dùng thành công');
-                            location.reload(); // Tải lại trang sau khi xoá thành công
-                        } else {
-                            alert('Không thể xoá người dùng');
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error deleting user:', error);
-                        alert('Đã xảy ra lỗi khi xoá người dùng');
-                    });
-            }
-
-            // Sự kiện khi nhấn vào nút "Xem Chi Tiết"
-            $(document).on('click', '.btn-view-detail', function () {
-                const userId = $(this).data('id');
-
-                // Gọi API để lấy thông tin chi tiết của người dùng
-                fetch(`/api/users/get_user_by_id?id=${userId}`)
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-                            const user = data.user;
-
-                            // Điền thông tin người dùng vào modal
-                            $('#detail-id').text(user.id);
-                            $('#detail-username').text(user.username);
-                            $('#detail-password').text(user.password);
-                            $('#detail-email').text(user.email);
-                            $('#detail-fullname').text(user.fullname || 'N/A');
-                            $('#detail-phone').text(user.phone || 'N/A');
-                            $('#detail-address').text(user.address || 'N/A');
-                            $('#detail-role').text(user.role);
-                            $('#detail-created-at').text(user.created_at);
-
-                            // Hiển thị modal
-                            $('#userDetailModal').modal('show');
-                        } else {
-                            alert('Không thể lấy thông tin người dùng');
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error fetching user details:', error);
-                        alert('Đã xảy ra lỗi khi lấy thông tin người dùng');
-                    });
-            });
-        });
-
-    </script>
 
 </body>
 
