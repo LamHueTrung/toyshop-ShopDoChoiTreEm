@@ -148,11 +148,28 @@
 
             // Update cart item
             function updateCartItem(cartId, quantity) {
-                Swal.fire({
-                    icon: 'info',
-                    title: 'Tính đăng chưa phát triển',
-                    text: 'Quay lại sau.',
-                });
+                fetch('/api/cart/update_cart', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ cart_id: cartId, quantity: quantity })
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            loadCart();
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Cập nhật thành công',
+                                text: 'Sản phẩm đã được cập nhật trong giỏ hàng.',
+                            });
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Lỗi',
+                                text: data.error || 'Không thể cập nhật giỏ hàng.',
+                            });
+                        }
+                    });
             }
 
             // Remove cart item

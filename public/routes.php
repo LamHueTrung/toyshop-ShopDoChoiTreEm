@@ -22,7 +22,9 @@ switch ($page) {
     case 'home':
         require_once __DIR__ . '/../views/home.php';
         break;
-
+    case 'search':
+        require_once __DIR__ . '/../views/search.php';
+        break;
     case 'login':
         require_once __DIR__ . '/../views/login.php';
         break;

@@ -47,7 +47,7 @@
       </ul>
 
       <!-- Right Links -->
-      <form class="d-flex align-items-center me-2">
+      <form class="d-flex align-items-center me-2" id="searchForm">
         <input class="form-control me-2 rounded-pill" type="search" placeholder="Tìm kiếm sản phẩm..."
           aria-label="Search">
         <!-- <button class="btn btn-primary rounded-pill px-3" type="submit">Tìm kiếm</button> -->
@@ -68,6 +68,25 @@
     </div>
   </div>
 </nav>
+<script>
+  document.getElementById('searchForm').addEventListener('submit', function (event) {
+    event.preventDefault();
+    fetch(`/api/products/get_all_products?q=${this.querySelector('input').value}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+          sessionStorage.setItem('products', JSON.stringify(data.products));
+            window.location.href = '/?page=search';
+        }
+      })
+      .catch(error => console.error('Lỗi:', error));
+  });
+</script>
 <script>
   document.getElementById('logoutForm').addEventListener('submit', function (event) {
     event.preventDefault();

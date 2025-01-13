@@ -13,6 +13,34 @@ class ProductController
         $this->productModel = new Product($pdo);
         $this->productImageModel = new ProductImage($pdo);
     }
+    public function searchProducts($keyword)
+    {
+        try {
+            if (empty($keyword)) {
+                throw new Exception('Từ khóa tìm kiếm không được để trống.');
+            }
+
+            // Lấy sản phẩm từ cơ sở dữ liệu
+            $products = $this->productModel->searchByKeyword($keyword);
+
+            // Thêm hình ảnh cho từng sản phẩm
+            foreach ($products as &$product) {
+                $images = $this->productImageModel->getByProductId($product['id']);
+                $product['images'] = !empty($images) ? $images : [['image_url' => '/uploads/default-image.jpg']];
+            }
+
+            return [
+                'success' => true,
+                'products' => $products,
+            ];
+        } catch (Exception $e) {
+            return [
+                'success' => false,
+                'error' => $e->getMessage(),
+            ];
+        }
+    }
+
 
     public function createProduct($data, $files)
     {
@@ -155,7 +183,7 @@ class ProductController
             foreach ($images as $image) {
                 // Lấy đường dẫn đầy đủ của tệp
                 $filePath = __DIR__ . '/../public' . $image['image_url'];
-            
+
                 // Kiểm tra và xóa tệp nếu tồn tại
                 if (!empty($image['image_url']) && file_exists($filePath)) {
                     unlink($filePath);
@@ -163,7 +191,7 @@ class ProductController
                     echo "Tệp không tồn tại hoặc không thể xóa: {$filePath}\n";
                 }
             }
-            
+
             // Xóa sản phẩm
             $result = $this->productModel->delete($id);
 

@@ -122,4 +122,20 @@ class Product
             return ['error' => $e->getMessage()];
         }
     }
+
+    public function searchByKeyword($keyword)
+    {
+        $sql = "SELECT * FROM products WHERE name LIKE :keyword1 OR description LIKE :keyword2";
+        $stmt = $this->pdo->prepare($sql);
+
+        // Gắn giá trị cho cả hai tham số
+        $stmt->execute([
+            'keyword1' => '%' . $keyword . '%',
+            'keyword2' => '%' . $keyword . '%',
+        ]);
+
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+
 }
