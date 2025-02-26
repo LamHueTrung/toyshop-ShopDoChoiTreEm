@@ -284,11 +284,11 @@
                                 relatedProducts.innerHTML = categoryData.products.map(product => `
                                     <div class="col-md-3">
                                         <div class="product-card">
-                                            <img src="${product.image_url || '/uploads/default.png'}" alt="${product.name}">
+                                            <img src="${product.images || '/uploads/default.png'}" alt="${product.name}">
                                             <h5>${product.name}</h5>
                                             <p>${Number(product.price).toLocaleString()} VND</p>
-                                            <a href="/index.php?page=product-detail&id=${product.id}" class="btn btn-primary btn-sm">Xem chi tiết</a>
-                                        </div>
+                                            <a href="/?page=product&id=${product.id}" class="btn btn-primary btn-sm">Xem chi tiết</a>
+                                        </div>  
                                     </div>
                                 `).join('');
                             });
